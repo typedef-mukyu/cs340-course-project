@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Employee Positions</title>
+</head>
+<body>
+    <h1>Manage Employee Positions</h1>
+    
+    <h2>Add Employee Position</h2>
+    <form action="/employee_positions" method="post">
+        <label for="employeeID">Employee ID:</label>
+        <select id="employeeID" name="employeeID" required>
+        </select><br>
+        
+        <label for="positionID">Position ID:</label>
+        <select id="positionID" name="positionID" required>
+        </select><br>
+        
+        <label for="salary">Salary:</label>
+        <input type="number" step="0.01" id="salary" name="salary" required><br>
+        
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" name="startDate" required><br>
+        
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" name="endDate"><br>
+        
+        <input type="submit" value="Add Employee Position">
+    </form>
+
+    <h2>View Employee Positions</h2>
+    <table id="employeePositionsTable">
+        <thead>
+            <tr>
+                <th>Term ID</th>
+                <th>Employee ID</th>
+                <th>Position ID</th>
+                <th>Salary</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <button onclick="fetchEmployeePositions()">View All Employee Positions</button>
+
+    <h2>Update Employee Position</h2>
+    <form action="/employee_positions" method="put">
+        <label for="termID">Term ID:</label>
+        <input type="text" id="termID" name="termID" required><br>
+        
+        <label for="employeeID">Employee ID:</label>
+        <select id="updateEmployeeID" name="employeeID">
+        </select><br>
+        
+        <label for="positionID">Position ID:</label>
+        <select id="updatePositionID" name="positionID">
+        </select><br>
+        
+        <label for="salary">Salary:</label>
+        <input type="number" step="0.01" id="updateSalary" name="salary"><br>
+        
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="updateStartDate" name="startDate"><br>
+        
+        <label for="endDate">End Date:</label>
+        <input type="date" id="updateEndDate" name="endDate"><br>
+        
+        <input type="submit" value="Update Employee Position">
+    </form>
+
+    <h2>Delete Employee Position</h2>
+    <form action="/employee_positions" method="delete">
+        <label for="termID">Term ID:</label>
+        <input type="text" id="termID" name="termID" required><br>
+        
+        <input type="submit" value="Delete Employee Position">
+    </form>
+
+    <script>
+        // Fetch and populate dropdowns
+        function populateDropdowns() {
+            fetch('/employees')
+                .then(response => response.json())
+                .then(data => {
+                    let employeeSelect = document.getElementById('employeeID');
+                    let updateEmployeeSelect = document.getElementById('updateEmployeeID');
+                    data.forEach(employee => {
+                        let option = document.createElement('option');
+                        option.value = employee.employeeID;
+                        option.text = employee.fullName;
+                        employeeSelect.appendChild(option);
+                        let updateOption = option.cloneNode(true);
+                        updateEmployeeSelect.appendChild(updateOption);
+                    });
+                });
+
+            fetch('/positions')
+                .then(response => response.json())
+                .then(data => {
+                    let positionSelect = document.getElementById('positionID');
+                    let updatePositionSelect = document.getElementById('updatePositionID');
+                    data.forEach(position => {
+                        let option = document.createElement('option');
+                        option.value = position.positionID;
+                        option.text = position.positionTitle;
+                        positionSelect.appendChild(option);
+                        let updateOption = option.cloneNode(true);
+                        updatePositionSelect.appendChild(updateOption);
+                    });
+                });
+        }
+
+        // Fetch and display employee positions
+        function fetchEmployeePositions() {
+            fetch('/employee_positions')
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = document.getElementById('employeePositionsTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+                    data.forEach(employeePosition => {
+                        let row = tableBody.insertRow();
+                        row.insertCell(0).innerText = employeePosition.termID;
+                        row.insertCell(1).innerText = employeePosition.employeeID;
+                        row.insertCell(2).innerText = employeePosition.positionID;
+                        row.insertCell(3).innerText = employeePosition.salary;
+                        row.insertCell(4).innerText = employeePosition.startDate;
+                        row.insertCell(5).innerText = employeePosition.endDate;
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Populate dropdowns on page load
+        document.addEventListener('DOMContentLoaded', populateDropdowns);
+    </script>
+</body>
+</html>

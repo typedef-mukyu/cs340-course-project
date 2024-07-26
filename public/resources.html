@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Resources</title>
+</head>
+<body>
+    <h1>Manage Resources</h1>
+    
+    <h2>Add Resource</h2>
+    <form action="/resources" method="post">
+        <label for="resourceName">Resource Name:</label>
+        <input type="text" id="resourceName" name="resourceName" required><br>
+        
+        <label for="resourceCost">Resource Cost:</label>
+        <input type="number" step="0.01" id="resourceCost" name="resourceCost" required><br>
+        
+        <label for="resourceDesc">Resource Description:</label>
+        <input type="text" id="resourceDesc" name="resourceDesc"><br>
+        
+        <label for="projectID">Project ID:</label>
+        <select id="projectID" name="projectID">
+            <option value="">None</option>
+        </select><br>
+        
+        <input type="submit" value="Add Resource">
+    </form>
+
+    <h2>View Resources</h2>
+    <table id="resourcesTable">
+        <thead>
+            <tr>
+                <th>Resource ID</th>
+                <th>Resource Name</th>
+                <th>Resource Cost</th>
+                <th>Resource Description</th>
+                <th>Project ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be inserted dynamically -->
+        </tbody>
+    </table>
+    <button onclick="fetchResources()">View All Resources</button>
+
+    <h2>Update Resource</h2>
+    <form action="/resources" method="put">
+        <label for="resourceID">Resource ID:</label>
+        <input type="text" id="resourceID" name="resourceID" required><br>
+        
+        <label for="resourceName">Resource Name:</label>
+        <input type="text" id="resourceName" name="resourceName"><br>
+        
+        <label for="resourceCost">Resource Cost:</label>
+        <input type="number" step="0.01" id="resourceCost" name="resourceCost"><br>
+        
+        <label for="resourceDesc">Resource Description:</label>
+        <input type="text" id="resourceDesc" name="resourceDesc"><br>
+        
+        <label for="projectID">Project ID:</label>
+        <select id="updateProjectID" name="projectID">
+            <option value="">None</option>
+        </select><br>
+        
+        <input type="submit" value="Update Resource">
+    </form>
+
+    <h2>Delete Resource</h2>
+    <form action="/resources" method="delete">
+        <label for="resourceID">Resource ID:</label>
+        <input type="text" id="resourceID" name="resourceID" required><br>
+        
+        <input type="submit" value="Delete Resource">
+    </form>
+
+    <script>
+        // Fetch and populate project dropdown
+        function populateProjectDropdown() {
+            fetch('/projects')
+                .then(response => response.json())
+                .then(data => {
+                    let projectSelect = document.getElementById('projectID');
+                    let updateProjectSelect = document.getElementById('updateProjectID');
+                    data.forEach(project => {
+                        let option = document.createElement('option');
+                        option.value = project.projectID;
+                        option.text = project.projectName;
+                        projectSelect.appendChild(option);
+                        let updateOption = option.cloneNode(true);
+                        updateProjectSelect.appendChild(updateOption);
+                    });
+                });
+        }
+
+        // Fetch and display resources
+        function fetchResources() {
+            fetch('/resources')
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = document.getElementById('resourcesTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+                    data.forEach(resource => {
+                        let row = tableBody.insertRow();
+                        row.insertCell(0).innerText = resource.resourceID;
+                        row.insertCell(1).innerText = resource.resourceName;
+                        row.insertCell(2).innerText = resource.resourceCost;
+                        row.insertCell(3).innerText = resource.resourceDesc;
+                        row.insertCell(4).innerText = resource.projectID;
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Populate project dropdown on page load
+        document.addEventListener('DOMContentLoaded', populateProjectDropdown);
+    </script>
+</body>
+</html>

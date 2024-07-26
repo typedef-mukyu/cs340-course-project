@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Projects</title>
+</head>
+<body>
+    <h1>Manage Projects</h1>
+    
+    <h2>Add Project</h2>
+    <form action="/projects" method="post">
+        <label for="projectName">Project Name:</label>
+        <input type="text" id="projectName" name="projectName" required><br>
+        
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" name="startDate"><br>
+        
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" name="endDate"><br>
+        
+        <label for="projectedBudget">Projected Budget:</label>
+        <input type="number" step="0.01" id="projectedBudget" name="projectedBudget" required><br>
+        
+        <input type="submit" value="Add Project">
+    </form>
+
+    <h2>View Projects</h2>
+    <table id="projectsTable">
+        <thead>
+            <tr>
+                <th>Project ID</th>
+                <th>Project Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Projected Budget</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <button onclick="fetchProjects()">View All Projects</button>
+
+    <h2>Update Project</h2>
+    <form action="/projects" method="put">
+        <label for="projectID">Project ID:</label>
+        <input type="text" id="projectID" name="projectID" required><br>
+        
+        <label for="projectName">Project Name:</label>
+        <input type="text" id="projectName" name="projectName"><br>
+        
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" name="startDate"><br>
+        
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" name="endDate"><br>
+        
+        <label for="projectedBudget">Projected Budget:</label>
+        <input type="number" step="0.01" id="projectedBudget" name="projectedBudget"><br>
+        
+        <input type="submit" value="Update Project">
+    </form>
+
+    <h2>Delete Project</h2>
+    <form action="/projects" method="delete">
+        <label for="projectID">Project ID:</label>
+        <input type="text" id="projectID" name="projectID" required><br>
+        
+        <input type="submit" value="Delete Project">
+    </form>
+
+    <script>
+        // Fetch and display projects
+        function fetchProjects() {
+            fetch('/projects')
+                .then(response => response.json())
+                .then(data => {
+                    let tableBody = document.getElementById('projectsTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+                    data.forEach(project => {
+                        let row = tableBody.insertRow();
+                        row.insertCell(0).innerText = project.projectID;
+                        row.insertCell(1).innerText = project.projectName;
+                        row.insertCell(2).innerText = project.startDate;
+                        row.insertCell(3).innerText = project.endDate;
+                        row.insertCell(4).innerText = project.projectedBudget;
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@ var express = require('express');
 var app = express();
 var db = require('./db-connector');
 var path = require('path');
-PORT = 9174;
+PORT = 39393;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -145,7 +145,7 @@ app.delete('/projects/:id', function(req, res) {
 
 // Read all resources
 app.get('/resources', function(req, res) {
-    let query = 'SELECT * FROM Resources';
+    let query = 'SELECT Resources.*, Projects.projectName FROM Resources LEFT JOIN Projects ON Resources.ProjectID = Projects.ProjectID;';
     db.pool.query(query, function(err, results) {
         if (err) throw err;
         res.json(results);
@@ -206,7 +206,7 @@ app.post('/employee_positions', function(req, res) {
 
 // Update an employee position
 app.put('/employee_positions/:id', function(req, res) {
-    let query = 'UPDATE EmployeePositions SET employeeID = ?, positionID = ?, salary = ?, startDate = ?, endDate = ? WHERE termID = ?';
+    let query = 'UPDATE EmployeePositions SET employeeID = ?, positionID = ?, salary = ?, startDate = ?, endDate = ? WHERE employeePositionID = ?';
     let values = [req.body.employeeID, req.body.positionID, req.body.salary, req.body.startDate, req.body.endDate, req.params.id];
     db.pool.query(query, values, function(err, results) {
         if (err) throw err;
@@ -216,7 +216,7 @@ app.put('/employee_positions/:id', function(req, res) {
 
 // Delete an employee position
 app.delete('/employee_positions/:id', function(req, res) {
-    let query = 'DELETE FROM EmployeePositions WHERE termID = ?';
+    let query = 'DELETE FROM EmployeePositions WHERE employeePositionID = ?';
     db.pool.query(query, req.params.id, function(err, results) {
         if (err) throw err;
         res.sendStatus(204);

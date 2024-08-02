@@ -52,7 +52,8 @@ DELETE FROM Projects WHERE projectID = :projectID;
 -- Resources Table Queries
 
 -- Select all resources
-SELECT * FROM Resources;
+SELECT Resources.*, Projects.projectName FROM Resources
+LEFT JOIN Projects ON Resources.projectID = Projects.projectID;
 
 -- Insert a new resource
 INSERT INTO Resources (resourceName, resourceCost, resourceDesc, projectID)
@@ -69,7 +70,9 @@ DELETE FROM Resources WHERE resourceID = :resourceID;
 -- EmployeePositions Table Queries
 
 -- Select all employee positions
-SELECT * FROM EmployeePositions;
+SELECT EmployeePositions.*, Employees.fullName, Positions.positionTitle FROM EmployeePositions
+INNER JOIN Employees ON EmployeePositions.employeeID = Employees.employeeID
+INNER JOIN Positions ON EmployeePositions.positionID = Positions.positionID;
 
 -- Insert a new employee position
 INSERT INTO EmployeePositions (employeeID, positionID, salary, startDate, endDate)
@@ -78,15 +81,17 @@ VALUES (:employeeID, :positionID, :salary, :startDate, :endDate);
 -- Update an employee position
 UPDATE EmployeePositions
 SET employeeID = :employeeID, positionID = :positionID, salary = :salary, startDate = :startDate, endDate = :endDate
-WHERE termID = :termID;
+WHERE employeePositionID = :employeePositionID;
 
 -- Delete an employee position
-DELETE FROM EmployeePositions WHERE termID = :termID;
+DELETE FROM EmployeePositions WHERE employeePositionID = :employeePositionID;
 
 -- ProjectEmployees Table Queries
 
 -- Select all project employees
-SELECT * FROM ProjectEmployees;
+SELECT ProjectEmployees.*, Employees.fullName, Projects.projectName FROM ProjectEmployees
+INNER JOIN Employees ON ProjectEmployees.employeeID = Employees.employeeID
+INNER JOIN Projects ON ProjectEmployees.projectID = Projects.projectID;
 
 -- Insert a new project employee
 INSERT INTO ProjectEmployees (employeeID, projectID, role, hoursWorkedTotal)

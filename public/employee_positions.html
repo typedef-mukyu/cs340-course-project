@@ -33,7 +33,7 @@
     <table id="employeePositionsTable">
         <thead>
             <tr>
-                <th>Term ID</th>
+                <th>Employee Position ID</th>
                 <th>Employee ID</th>
                 <th>Position ID</th>
                 <th>Salary</th>
@@ -48,8 +48,8 @@
 
     <h2>Update Employee Position</h2>
     <form action="/employee_positions" method="put">
-        <label for="termID">Term ID:</label>
-        <input type="text" id="termID" name="termID" required><br>
+        <label for="employeePositionID">Employee Position ID:</label>
+        <input type="text" id="employeePositionID" name="employeePositionID" required><br>
         
         <label for="employeeID">Employee ID:</label>
         <select id="updateEmployeeID" name="employeeID">
@@ -73,8 +73,8 @@
 
     <h2>Delete Employee Position</h2>
     <form action="/employee_positions" method="delete">
-        <label for="termID">Term ID:</label>
-        <input type="text" id="termID" name="termID" required><br>
+        <label for="employeePositionID">Employee Position ID:</label>
+        <input type="text" id="employeePositionID" name="employeePositionID" required><br>
         
         <input type="submit" value="Delete Employee Position">
     </form>
@@ -122,7 +122,7 @@
                     tableBody.innerHTML = '';
                     data.forEach(employeePosition => {
                         let row = tableBody.insertRow();
-                        row.insertCell(0).innerText = employeePosition.termID;
+                        row.insertCell(0).innerText = employeePosition.employeePositionID;
                         row.insertCell(1).innerText = employeePosition.employeeID;
                         row.insertCell(2).innerText = employeePosition.positionID;
                         row.insertCell(3).innerText = employeePosition.salary;

@@ -2,130 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Project Employees</title>
+    <title>Manage Resources</title>
+    <link rel="stylesheet" href="stylesheet.css"> 
 </head>
 <body>
-    <h1>Manage Project Employees</h1>
-    
-    <h2>Add Project Employee</h2>
-    <form action="/project_employees" method="post">
-        <label for="employeeID">Employee ID:</label>
-        <select id="employeeID" name="employeeID" required>
-        </select><br>
-        
-        <label for="projectID">Project ID:</label>
-        <select id="projectID" name="projectID" required>
-        </select><br>
-        
-        <label for="role">Role:</label>
-        <input type="text" id="role" name="role" required><br>
-        
-        <label for="hoursWorkedTotal">Hours Worked Total:</label>
-        <input type="number" step="0.01" id="hoursWorkedTotal" name="hoursWorkedTotal" required><br>
-        
-        <input type="submit" value="Add Project Employee">
-    </form>
+    <div id="sidebar">
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index.html"><span>Home</span></a></li>
+            <li><a href="employees.html"><span>Manage Employees</span></a></li>
+            <li><a href="positions.html"><span>Manage Positions</span></a></li>
+            <li><a href="projects.html"><span>Manage Projects</span></a></li>
+            <li><a href="resources.html"><span>Manage Resources</span></a></li>
+            <li><a href="employee_positions.html"><span>Manage Employee Positions</span></a></li>
+            <li><a href="project_employees.html"><span>Manage Project Employees</span></a></li>
+        </ul>
+    </div>
+    <button id="toggleButton"></button>
+    <div id="content">
+        <h1>Manage Project Employees</h1>
 
-    <h2>View Project Employees</h2>
-    <table id="projectEmployeesTable">
-        <thead>
-            <tr>
-                <th>Project Employee ID</th>
-                <th>Employee ID</th>
-                <th>Project ID</th>
-                <th>Role</th>
-                <th>Hours Worked Total</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <button onclick="fetchProjectEmployees()">View All Project Employees</button>
+        <div id="table-placeholder"></div>
 
-    <h2>Update Project Employee</h2>
-    <form action="/project_employees" method="put">
-        <label for="projectEmployeeID">Project Employee ID:</label>
-        <input type="text" id="projectEmployeeID" name="projectEmployeeID" required><br>
-        
-        <label for="employeeID">Employee ID:</label>
-        <select id="updateEmployeeID" name="employeeID">
-        </select><br>
-        
-        <label for="projectID">Project ID:</label>
-        <select id="updateProjectID" name="projectID">
-        </select><br>
-        
-        <label for="role">Role:</label>
-        <input type="text" id="updateRole" name="role"><br>
-        
-        <label for="hoursWorkedTotal">Hours Worked Total:</label>
-        <input type="number" step="0.01" id="updateHoursWorkedTotal" name="hoursWorkedTotal"><br>
-        
-        <input type="submit" value="Update Project Employee">
-    </form>
-
-    <h2>Delete Project Employee</h2>
-    <form action="/project_employees" method="delete">
-        <label for="projectEmployeeID">Project Employee ID:</label>
-        <input type="text" id="projectEmployeeID" name="projectEmployeeID" required><br>
-        
-        <input type="submit" value="Delete Project Employee">
-    </form>
-
-    <script>
-        // Fetch and populate dropdowns
-        function populateDropdowns() {
-            fetch('/employees')
-                .then(response => response.json())
-                .then(data => {
-                    let employeeSelect = document.getElementById('employeeID');
-                    let updateEmployeeSelect = document.getElementById('updateEmployeeID');
-                    data.forEach(employee => {
-                        let option = document.createElement('option');
-                        option.value = employee.employeeID;
-                        option.text = employee.fullName;
-                        employeeSelect.appendChild(option);
-                        let updateOption = option.cloneNode(true);
-                        updateEmployeeSelect.appendChild(updateOption);
-                    });
-                });
-
-            fetch('/projects')
-                .then(response => response.json())
-                .then(data => {
-                    let projectSelect = document.getElementById('projectID');
-                    let updateProjectSelect = document.getElementById('updateProjectID');
-                    data.forEach(project => {
-                        let option = document.createElement('option');
-                        option.value = project.projectID;
-                        option.text = project.projectName;
-                        projectSelect.appendChild(option);
-                        let updateOption = option.cloneNode(true);
-                        updateProjectSelect.appendChild(updateOption);
-                    });
-                });
-        }
-
-        // Fetch and display project employees
-        function fetchProjectEmployees() {
-            fetch('/project_employees')
-                .then(response => response.json())
-                .then(data => {
-                    let tableBody = document.getElementById('projectEmployeesTable').getElementsByTagName('tbody')[0];
-                    tableBody.innerHTML = '';
-                    data.forEach(projectEmployee => {
-                        let row = tableBody.insertRow();
-                        row.insertCell(0).innerText = projectEmployee.projectEmployeeID;
-                        row.insertCell(1).innerText = projectEmployee.employeeID;
-                        row.insertCell(2).innerText = projectEmployee.projectID;
-                        row.insertCell(3).innerText = projectEmployee.role;
-                        row.insertCell(4).innerText = projectEmployee.hoursWorkedTotal;
-                    });
-                });
-        }
-
-        // Populate dropdowns on page load
-        document.addEventListener('DOMContentLoaded', populateDropdowns);
-    </script>
+        <script src="common.js"></script>
+        <script>
+            var tablePlaceholder = document.getElementById("table-placeholder");
+            
+            var projectEmployees = getData("/project_employees");
+            var projects = getData("/projects");
+            var employees = getData("/employees");
+            var projectEmployeeDataTypes = [
+                {header: "Project Employee ID", attribName: "projectID", type: "num0", nullable: false, autoinc: true},
+                {header: "Employee Name", attribName: "fullName", type: "text", nullable: false, fkinfo: {
+                    attribName: "fullName",
+                    fkName: "employeeID",
+                    pkName: "employeeID",
+                    data: employees
+                }},
+                {header: "Project Name", attribName: "projectName", type: "text", nullable: false, fkinfo: {
+                    attribName: "projectName",
+                    fkName: "projectID",
+                    pkName: "projectID",
+                    data: projects
+                }},
+                {header: "Role", attribName: "role", type: "text", nullable: false},
+                {header: "Total Hours Worked", attribName: "hoursWorkedTotal", type: "num4", nullable: false}
+            ];
+           
+            let projectEmployeesTable = newTableFromData(projectEmployees, projectEmployeeDataTypes);
+            tablePlaceholder.append(projectEmployeesTable);
+        </script>
+    </div>
 </body>
 </html>

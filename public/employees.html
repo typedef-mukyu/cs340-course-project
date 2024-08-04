@@ -2,86 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Employees</title>
+    <title>Manage Resources</title>
+    <link rel="stylesheet" href="stylesheet.css"> 
 </head>
 <body>
-    <h1>Manage Employees</h1>
-    
-    <h2>Add Employee</h2>
-    <form action="/employees" method="post">
-        <label for="fullName">Full Name:</label>
-        <input type="text" id="fullName" name="fullName" required><br>
-        
-        <label for="employeeID">Employee ID:</label>
-        <input type="text" id="employeeID" name="employeeID" required><br>
-        
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username"><br>
-        
-        <label for="projectHoursTotal">Total Project Hours:</label>
-        <input type="number" step="0.01" id="projectHoursTotal" name="projectHoursTotal" required><br>
-        
-        <input type="submit" value="Add Employee">
-    </form>
+    <div id="sidebar">
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index.html"><span>Home</span></a></li>
+            <li><a href="employees.html"><span>Manage Employees</span></a></li>
+            <li><a href="positions.html"><span>Manage Positions</span></a></li>
+            <li><a href="projects.html"><span>Manage Projects</span></a></li>
+            <li><a href="resources.html"><span>Manage Resources</span></a></li>
+            <li><a href="employee_positions.html"><span>Manage Employee Positions</span></a></li>
+            <li><a href="project_employees.html"><span>Manage Project Employees</span></a></li>
+        </ul>
+    </div>
+    <button id="toggleButton"></button>
+    <div id="content">
+        <h1>Manage Employees</h1>
 
-    <h2>View Employees</h2>
-    <table id="employeesTable">
-        <thead>
-            <tr>
-                <th>Employee ID</th>
-                <th>Full Name</th>
-                <th>Username</th>
-                <th>Total Project Hours</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <button onclick="fetchEmployees()">View All Employees</button>
+        <div id="table-placeholder"></div>
 
-    <h2>Update Employee</h2>
-    <form action="/employees" method="put">
-        <label for="employeeID">Employee ID:</label>
-        <input type="text" id="employeeID" name="employeeID" required><br>
-        
-        <label for="fullName">Full Name:</label>
-        <input type="text" id="fullName" name="fullName"><br>
-        
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username"><br>
-        
-        <label for="projectHoursTotal">Total Project Hours:</label>
-        <input type="number" step="0.01" id="projectHoursTotal" name="projectHoursTotal"><br>
-        
-        <input type="submit" value="Update Employee">
-    </form>
-
-    <h2>Delete Employee</h2>
-    <form action="/employees" method="delete">
-        <label for="employeeID">Employee ID:</label>
-        <input type="text" id="employeeID" name="employeeID" required><br>
-        
-        <input type="submit" value="Delete Employee">
-    </form>
-
-    <script>
-        // Fetch and display employees
-        function fetchEmployees() {
-            fetch('/employees')
-                .then(response => response.json())
-                .then(data => {
-                    let tableBody = document.getElementById('employeesTable').getElementsByTagName('tbody')[0];
-                    tableBody.innerHTML = '';
-                    data.forEach(employee => {
-                        let row = tableBody.insertRow();
-                        row.insertCell(0).innerText = employee.employeeID;
-                        row.insertCell(1).innerText = employee.fullName;
-                        row.insertCell(2).innerText = employee.username;
-                        row.insertCell(3).innerText = employee.projectHoursTotal;
-                    });
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        }
-    </script>
+        <script src="common.js"></script>
+        <script>
+            var tablePlaceholder = document.getElementById("table-placeholder");
+            
+            var employees = getData("/employees");
+            var employeeDataTypes = [
+                {header: "Employee ID", attribName: "employeeID", type: "num0", nullable: false, autoinc: false},
+                {header: "Full Name", attribName: "fullName", type: "text", nullable: false},
+                {header: "Username", attribName: "username", type: "text", nullable: true},
+                {header: "Total Project Hours", attribName: "projectHoursTotal", type: "num4", nullable: false}
+            ];
+           
+            let employeesTable = newTableFromData(employees, employeeDataTypes);
+            tablePlaceholder.append(employeesTable);
+        </script>
+    </div>
 </body>
 </html>

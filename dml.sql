@@ -55,6 +55,16 @@ DELETE FROM Projects WHERE projectID = :projectID;
 SELECT Resources.*, Projects.projectName FROM Resources
 LEFT JOIN Projects ON Resources.projectID = Projects.projectID;
 
+-- Select all resources not associated with a Project
+SELECT Resources.*, Projects.projectName FROM Resources
+LEFT JOIN Projects ON Resources.projectID = Projects.projectID -- use left join here to avoid excluding Resources with NULL projectID
+WHERE Resources.projectID IS NULL;
+
+-- Select all resources
+SELECT Resources.*, Projects.projectName FROM Resources
+LEFT JOIN Projects ON Resources.projectID = Projects.projectID -- use left join here to avoid excluding Resources with NULL projectID
+WHERE Resources.projectID = :id;
+
 -- Insert a new resource
 INSERT INTO Resources (resourceName, resourceCost, resourceDesc, projectID)
 VALUES (:resourceName, :resourceCost, :resourceDesc, :projectID);

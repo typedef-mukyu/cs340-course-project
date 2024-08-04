@@ -2,91 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Projects</title>
+    <title>Manage Resources</title>
+    <link rel="stylesheet" href="stylesheet.css"> 
 </head>
 <body>
-    <h1>Manage Projects</h1>
-    
-    <h2>Add Project</h2>
-    <form action="/projects" method="post">
-        <label for="projectName">Project Name:</label>
-        <input type="text" id="projectName" name="projectName" required><br>
-        
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDate" name="startDate"><br>
-        
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDate" name="endDate"><br>
-        
-        <label for="projectedBudget">Projected Budget:</label>
-        <input type="number" step="0.01" id="projectedBudget" name="projectedBudget" required><br>
-        
-        <input type="submit" value="Add Project">
-    </form>
+    <div id="sidebar">
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index.html"><span>Home</span></a></li>
+            <li><a href="employees.html"><span>Manage Employees</span></a></li>
+            <li><a href="positions.html"><span>Manage Positions</span></a></li>
+            <li><a href="projects.html"><span>Manage Projects</span></a></li>
+            <li><a href="resources.html"><span>Manage Resources</span></a></li>
+            <li><a href="employee_positions.html"><span>Manage Employee Positions</span></a></li>
+            <li><a href="project_employees.html"><span>Manage Project Employees</span></a></li>
+        </ul>
+    </div>
+    <button id="toggleButton"></button>
+    <div id="content">
+        <h1>Manage Projects</h1>
 
-    <h2>View Projects</h2>
-    <table id="projectsTable">
-        <thead>
-            <tr>
-                <th>Project ID</th>
-                <th>Project Name</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Projected Budget</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <button onclick="fetchProjects()">View All Projects</button>
+        <div id="table-placeholder"></div>
 
-    <h2>Update Project</h2>
-    <form action="/projects" method="put">
-        <label for="projectID">Project ID:</label>
-        <input type="text" id="projectID" name="projectID" required><br>
-        
-        <label for="projectName">Project Name:</label>
-        <input type="text" id="projectName" name="projectName"><br>
-        
-        <label for="startDate">Start Date:</label>
-        <input type="date" id="startDate" name="startDate"><br>
-        
-        <label for="endDate">End Date:</label>
-        <input type="date" id="endDate" name="endDate"><br>
-        
-        <label for="projectedBudget">Projected Budget:</label>
-        <input type="number" step="0.01" id="projectedBudget" name="projectedBudget"><br>
-        
-        <input type="submit" value="Update Project">
-    </form>
-
-    <h2>Delete Project</h2>
-    <form action="/projects" method="delete">
-        <label for="projectID">Project ID:</label>
-        <input type="text" id="projectID" name="projectID" required><br>
-        
-        <input type="submit" value="Delete Project">
-    </form>
-
-    <script>
-        // Fetch and display projects
-        function fetchProjects() {
-            fetch('/projects')
-                .then(response => response.json())
-                .then(data => {
-                    let tableBody = document.getElementById('projectsTable').getElementsByTagName('tbody')[0];
-                    tableBody.innerHTML = '';
-                    data.forEach(project => {
-                        let row = tableBody.insertRow();
-                        row.insertCell(0).innerText = project.projectID;
-                        row.insertCell(1).innerText = project.projectName;
-                        row.insertCell(2).innerText = project.startDate;
-                        row.insertCell(3).innerText = project.endDate;
-                        row.insertCell(4).innerText = project.projectedBudget;
-                    });
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        }
-    </script>
+        <script src="common.js"></script>
+        <script>
+            var tablePlaceholder = document.getElementById("table-placeholder");
+            
+            var projects = getData("/projects");
+            var projectDataTypes = [
+                {header: "Project ID", attribName: "projectID", type: "num0", nullable: false, autoinc: true},
+                {header: "Project Name", attribName: "projectName", type: "text", nullable: false},
+                {header: "Start Date", attribName: "startDate", type: "date", nullable: true},
+                {header: "End Date", attribName: "endDate", type: "date", nullable: true},
+                {header: "Projected Budget", attribName: "projectedBudget", type: "num2", nullable: true},
+            ];
+           
+            let projectsTable = newTableFromData(projects, projectDataTypes);
+            tablePlaceholder.append(projectsTable);
+        </script>
+    </div>
 </body>
 </html>

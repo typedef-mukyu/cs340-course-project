@@ -1,0 +1,109 @@
+body {
+    background-color: #f0f0f0; 
+}
+#sidebar {
+    width: 200px;
+    background-color: #333;
+    padding: 15px;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+    transition: width 0.3s;
+    color: white;
+}
+#sidebar.collapsed {
+    width: 50px;
+    padding: 15px 5px;
+}
+#sidebar.collapsed h2, 
+#sidebar.collapsed ul, 
+#sidebar.collapsed ul li a span {
+    display: none;
+}
+#sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+#sidebar ul li {
+    padding: 8px;
+    text-align: left;
+}
+#sidebar ul li a {
+    text-decoration: none;
+    color: white;
+    display: block;
+}
+#sidebar ul li a:hover {
+    background-color: #555;
+    color: white;
+}
+#content {
+    margin-left: 220px;
+    padding: 15px;
+    transition: margin-left 0.3s;
+}
+#sidebar.collapsed + #content {
+    margin-left: 70px;
+}
+#toggleButton {
+    position: fixed;
+    left: 200px;
+    top: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: left 0.3s;
+}
+#sidebar.collapsed ~ #toggleButton {
+    left: 50px;
+}
+#sidebar.collapsed ~ #toggleButton::before {
+    content: '►';
+    display: block;
+}
+#toggleButton::before {
+    content: '◄';
+    display: block;
+}
+table {
+    border: 2px solid black;
+    border-collapse: collapse;
+    margin: 16px;
+}
+td, th {
+    padding: 8px;
+    border: 1px solid #404040;
+}
+
+thead, tfoot{
+    background-color: #a0a0a0;
+}
+#filter-row, h1, p{
+    margin: 16px;
+}
+
+.numeric-cell{
+    text-align: right;
+}
+.edit-button{
+    background-color: darkblue;
+    color: white;
+}
+.delete-button{
+    background-color: darkred;
+    color: white;
+}
+.save-button{
+    background-color: green;
+    color: white;
+}
+.add-button{
+    background-color: lightgreen;
+    color: black;
+}
+.cancel-button{
+    background-color: goldenrod;
+    color: white;
+}
+

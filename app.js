@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var db = require('./db-connector');
 var path = require('path');
+var os = require("os") // for hostname()
 PORT = 39393;
 
 app.use(express.json());
@@ -151,7 +152,23 @@ app.get('/resources', function(req, res) {
         res.json(results);
     });
 });
-
+// Read resources matching no projects
+app.get('/resources/projects', function(req, res) {
+    let query = 'SELECT Resources.*, Projects.projectName FROM Resources LEFT JOIN Projects ON Resources.ProjectID = Projects.ProjectID WHERE Resources.projectID IS NULL;';
+    db.pool.query(query, function(err, results) {
+        if (err) throw err;
+        res.json(results);
+    });
+});
+// Read resources matching a project
+app.get('/resources/projects/:id', function(req, res) {
+    let query = 'SELECT Resources.*, Projects.projectName FROM Resources LEFT JOIN Projects ON Resources.ProjectID = Projects.ProjectID WHERE Resources.projectID = ?;';
+    let values = [req.params.id]
+    db.pool.query(query, values, function(err, results) {
+        if (err) throw err;
+        res.json(results);
+    });
+});
 // Create a new resource
 app.post('/resources', function(req, res) {
     let query = 'INSERT INTO Resources (resourceName, resourceCost, resourceDesc, projectID) VALUES (?, ?, ?, ?)';
@@ -187,7 +204,7 @@ app.delete('/resources/:id', function(req, res) {
 
 // Read all employee positions
 app.get('/employee_positions', function(req, res) {
-    let query = 'SELECT * FROM EmployeePositions';
+    let query = 'SELECT EmployeePositions.*, Employees.fullName, Positions.positionTitle FROM EmployeePositions INNER JOIN Employees on EmployeePositions.employeeID = Employees.employeeID INNER JOIN Positions on EmployeePositions.positionID = Positions.positionID;';
     db.pool.query(query, function(err, results) {
         if (err) throw err;
         res.json(results);
@@ -226,7 +243,7 @@ app.delete('/employee_positions/:id', function(req, res) {
 
 // Read all project employees
 app.get('/project_employees', function(req, res) {
-    let query = 'SELECT * FROM ProjectEmployees';
+    let query = 'SELECT ProjectEmployees.*, Employees.fullName, Projects.projectName FROM ProjectEmployees INNER JOIN Employees ON ProjectEmployees.employeeID = Employees.employeeID INNER JOIN Projects ON ProjectEmployees.projectID = Projects.projectID;';
     db.pool.query(query, function(err, results) {
         if (err) throw err;
         res.json(results);
@@ -266,5 +283,5 @@ app.delete('/project_employees/:id', function(req, res) {
     LISTENER
 */
 app.listen(PORT, function() {
-    console.log('Express started on http://classwork.engr.oregonstate.edu/:' + PORT + '; press Ctrl-C to terminate.');
+    console.log('Express started on ' + os.hostname() + ":" + PORT + '; press Ctrl-C to terminate.');
 });

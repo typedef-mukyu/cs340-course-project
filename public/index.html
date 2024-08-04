@@ -3,16 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>Project Management System</title>
+    <link rel="stylesheet" href="stylesheet.css"> 
 </head>
 <body>
-    <h1>Project Management System</h1>
-    <ul>
-        <li><a href="employees.html">Manage Employees</a></li>
-        <li><a href="positions.html">Manage Positions</a></li>
-        <li><a href="projects.html">Manage Projects</a></li>
-        <li><a href="resources.html">Manage Resources</a></li>
-        <li><a href="employee_positions.html">Manage Employee Positions</a></li>
-        <li><a href="project_employees.html">Manage Project Employees</a></li>
-    </ul>
+    <div id="sidebar">
+        <h2>Navigation</h2>
+        <ul>
+            <li><a href="index.html"><span>Home</span></a></li>
+            <li><a href="employees.html"><span>Manage Employees</span></a></li>
+            <li><a href="positions.html"><span>Manage Positions</span></a></li>
+            <li><a href="projects.html"><span>Manage Projects</span></a></li>
+            <li><a href="resources.html"><span>Manage Resources</span></a></li>
+            <li><a href="employee_positions.html"><span>Manage Employee Positions</span></a></li>
+            <li><a href="project_employees.html"><span>Manage Project Employees</span></a></li>
+        </ul>
+    </div>
+    <button id="toggleButton"></button>
+    <div id="content">
+        <h1>Project Management System</h1>
+        <p>Use the navigation bar on the left to select a table to view.</p>
+    </div>
+
+    <script src="common.js"></script>
 </body>
 </html>

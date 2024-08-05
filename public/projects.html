@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Resources</title>
-    <link rel="stylesheet" href="stylesheet.css"> 
+    <title>Manage Projects</title>
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
     <div id="sidebar">
@@ -27,18 +27,24 @@
         <script src="common.js"></script>
         <script>
             var tablePlaceholder = document.getElementById("table-placeholder");
-            
-            var projects = getData("/projects");
+            var endpoint = "/projects";
+
             var projectDataTypes = [
                 {header: "Project ID", attribName: "projectID", type: "num0", nullable: false, autoinc: true},
                 {header: "Project Name", attribName: "projectName", type: "text", nullable: false},
-                {header: "Start Date", attribName: "startDate", type: "date", nullable: true},
+                {header: "Start Date", attribName: "startDate", type: "date", nullable: false},
                 {header: "End Date", attribName: "endDate", type: "date", nullable: true},
-                {header: "Projected Budget", attribName: "projectedBudget", type: "num2", nullable: true},
+                {header: "Projected Budget", attribName: "projectedBudget", type: "num2", nullable: true}
             ];
-           
-            let projectsTable = newTableFromData(projects, projectDataTypes);
-            tablePlaceholder.append(projectsTable);
+
+            function refreshTable() {
+                let projects = getData(endpoint);
+                let projectsTable = newTableFromData(projects, projectDataTypes);
+                tablePlaceholder.innerHTML = '';
+                tablePlaceholder.append(projectsTable);
+            }
+
+            refreshTable();
         </script>
     </div>
 </body>

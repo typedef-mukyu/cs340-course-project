@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Manage Resources</title>
-    <link rel="stylesheet" href="stylesheet.css"> 
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
     <div id="sidebar">
@@ -24,30 +24,27 @@
 
         <div id="table-placeholder"></div>
 
-        <div id="filter-row">Filter by Project: <span id="project-filter-placeholder"></span></div>
-
         <script src="common.js"></script>
         <script>
-            var tablePlaceholder = document.getElementById("table-placeholder")
-            var resources = getData("/resources");
-            var projects = getData("/projects");
+            var tablePlaceholder = document.getElementById("table-placeholder");
+            var endpoint = "/resources";
+
             var resourceDataTypes = [
                 {header: "Resource ID", attribName: "resourceID", type: "num0", nullable: false, autoinc: true},
                 {header: "Resource Name", attribName: "resourceName", type: "text", nullable: false},
                 {header: "Resource Cost", attribName: "resourceCost", type: "num2", nullable: true},
                 {header: "Resource Description", attribName: "resourceDesc", type: "text", nullable: true},
-                {header: "Project Name", attribName: "projectName", type: "text", nullable: true, fkinfo: {
-                    attribName: "projectName",
-                    fkName: "projectID",
-                    pkName: "projectID",
-                    data: projects
-                }}];
-            let resourcesTable = newTableFromData(resources, resourceDataTypes);
-            tablePlaceholder.append(resourcesTable);
-            
-            var filterPlaceholder = document.querySelector("#project-filter-placeholder");
-            var fkFilter = addFKFilterToTable(resourcesTable, projects, "projectName", "projectID", true, resourceDataTypes, "/resources/projects/");
-            filterPlaceholder.append(fkFilter);
+                {header: "Project ID", attribName: "projectID", type: "num0", nullable: true, fkinfo: {attribName: "projectName", fkName: "projectID", pkName: "projectID", data: getData("/projects")}}
+            ];
+
+            function refreshTable() {
+                let resources = getData(endpoint);
+                let resourcesTable = newTableFromData(resources, resourceDataTypes);
+                tablePlaceholder.innerHTML = '';
+                tablePlaceholder.append(resourcesTable);
+            }
+
+            refreshTable();
         </script>
     </div>
 </body>

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Resources</title>
-    <link rel="stylesheet" href="stylesheet.css"> 
+    <title>Manage Employee Positions</title>
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
     <div id="sidebar">
@@ -20,39 +20,32 @@
     </div>
     <button id="toggleButton"></button>
     <div id="content">
-        <h1>Manage Projects</h1>
+        <h1>Manage Employee Positions</h1>
 
         <div id="table-placeholder"></div>
 
         <script src="common.js"></script>
         <script>
             var tablePlaceholder = document.getElementById("table-placeholder");
-            
-            var employeePositions = getData("/employee_positions");
-            
-            var employees = getData("/employees");
-            var positions = getData("/positions");
+            var endpoint = "/employee_positions";
+
             var employeePositionDataTypes = [
                 {header: "Employee Position ID", attribName: "employeePositionID", type: "num0", nullable: false, autoinc: true},
-                {header: "Employee Name", attribName: "fullName", type: "text", nullable: false, fkinfo: {
-                    attribName: "fullName",
-                    fkName: "employeeID",
-                    pkName: "employeeID",
-                    data: employees
-                }},
-                {header: "Position Title", attribName: "positionTitle", type: "text", nullable: false, fkinfo: {
-                    attribName: "positionTitle",
-                    fkName: "positionID",
-                    pkName: "positionID",
-                    data: positions
-                }},
+                {header: "Employee ID", attribName: "employeeID", type: "num0", nullable: false, fkinfo: {attribName: "fullName", fkName: "employeeID", pkName: "employeeID", data: getData("/employees")}},
+                {header: "Position ID", attribName: "positionID", type: "num0", nullable: false, fkinfo: {attribName: "positionTitle", fkName: "positionID", pkName: "positionID", data: getData("/positions")}},
                 {header: "Salary", attribName: "salary", type: "num2", nullable: true},
-                {header: "Start Date", attribName: "startDate", type: "date", nullable: false},
+                {header: "Start Date", attribName: "startDate", type: "date", nullable: true},
                 {header: "End Date", attribName: "endDate", type: "date", nullable: true}
             ];
-           
-            let employeePositionsTable = newTableFromData(employeePositions, employeePositionDataTypes);
-            tablePlaceholder.append(employeePositionsTable);
+
+            function refreshTable() {
+                let employeePositions = getData(endpoint);
+                let employeePositionsTable = newTableFromData(employeePositions, employeePositionDataTypes);
+                tablePlaceholder.innerHTML = '';
+                tablePlaceholder.append(employeePositionsTable);
+            }
+
+            refreshTable();
         </script>
     </div>
 </body>

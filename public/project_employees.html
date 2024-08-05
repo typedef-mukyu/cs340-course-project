@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Resources</title>
-    <link rel="stylesheet" href="stylesheet.css"> 
+    <title>Manage Project Employees</title>
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
     <div id="sidebar">
@@ -27,30 +27,24 @@
         <script src="common.js"></script>
         <script>
             var tablePlaceholder = document.getElementById("table-placeholder");
-            
-            var projectEmployees = getData("/project_employees");
-            var projects = getData("/projects");
-            var employees = getData("/employees");
+            var endpoint = "/project_employees";
+
             var projectEmployeeDataTypes = [
-                {header: "Project Employee ID", attribName: "projectID", type: "num0", nullable: false, autoinc: true},
-                {header: "Employee Name", attribName: "fullName", type: "text", nullable: false, fkinfo: {
-                    attribName: "fullName",
-                    fkName: "employeeID",
-                    pkName: "employeeID",
-                    data: employees
-                }},
-                {header: "Project Name", attribName: "projectName", type: "text", nullable: false, fkinfo: {
-                    attribName: "projectName",
-                    fkName: "projectID",
-                    pkName: "projectID",
-                    data: projects
-                }},
-                {header: "Role", attribName: "role", type: "text", nullable: false},
-                {header: "Total Hours Worked", attribName: "hoursWorkedTotal", type: "num4", nullable: false}
+                {header: "Project Employee ID", attribName: "projectEmployeeID", type: "num0", nullable: false, autoinc: true},
+                {header: "Employee ID", attribName: "employeeID", type: "num0", nullable: false, fkinfo: {attribName: "fullName", fkName: "employeeID", pkName: "employeeID", data: getData("/employees")}},
+                {header: "Project ID", attribName: "projectID", type: "num0", nullable: false, fkinfo: {attribName: "projectName", fkName: "projectID", pkName: "projectID", data: getData("/projects")}},
+                {header: "Role", attribName: "role", type: "text", nullable: true},
+                {header: "Hours Worked Total", attribName: "hoursWorkedTotal", type: "num2", nullable: true}
             ];
-           
-            let projectEmployeesTable = newTableFromData(projectEmployees, projectEmployeeDataTypes);
-            tablePlaceholder.append(projectEmployeesTable);
+
+            function refreshTable() {
+                let projectEmployees = getData(endpoint);
+                let projectEmployeesTable = newTableFromData(projectEmployees, projectEmployeeDataTypes);
+                tablePlaceholder.innerHTML = '';
+                tablePlaceholder.append(projectEmployeesTable);
+            }
+
+            refreshTable();
         </script>
     </div>
 </body>

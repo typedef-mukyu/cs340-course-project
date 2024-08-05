@@ -27,16 +27,22 @@
         <script src="common.js"></script>
         <script>
             var tablePlaceholder = document.getElementById("table-placeholder");
-            
-            var projects = getData("/positions");
-            var projectDataTypes = [
+            var endpoint = "/positions";
+
+            var positionDataTypes = [
                 {header: "Position ID", attribName: "positionID", type: "num0", nullable: false, autoinc: true},
                 {header: "Position Title", attribName: "positionTitle", type: "text", nullable: false},
                 {header: "Budgeted Salary", attribName: "budgetedSalary", type: "num2", nullable: true}
             ];
-           
-            let projectsTable = newTableFromData(projects, projectDataTypes);
-            tablePlaceholder.append(projectsTable);
+
+            function refreshTable() {
+                let positions = getData(endpoint);
+                let positionsTable = newTableFromData(positions, positionDataTypes);
+                tablePlaceholder.innerHTML = '';
+                tablePlaceholder.append(positionsTable);
+            }
+
+            refreshTable();
         </script>
     </div>
 </body>

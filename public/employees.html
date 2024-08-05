@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Resources</title>
-    <link rel="stylesheet" href="stylesheet.css"> 
+    <title>Manage Employees</title>
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
 <body>
     <div id="sidebar">
@@ -27,17 +27,23 @@
         <script src="common.js"></script>
         <script>
             var tablePlaceholder = document.getElementById("table-placeholder");
-            
-            var employees = getData("/employees");
+            var endpoint = "/employees";
+
             var employeeDataTypes = [
-                {header: "Employee ID", attribName: "employeeID", type: "num0", nullable: false, autoinc: false},
+                {header: "Employee ID", attribName: "employeeID", type: "num0", nullable: false, autoinc: true},
                 {header: "Full Name", attribName: "fullName", type: "text", nullable: false},
-                {header: "Username", attribName: "username", type: "text", nullable: true},
-                {header: "Total Project Hours", attribName: "projectHoursTotal", type: "num4", nullable: false}
+                {header: "Username", attribName: "username", type: "text", nullable: false},
+                {header: "Project Hours Total", attribName: "projectHoursTotal", type: "num2", nullable: true}
             ];
-           
-            let employeesTable = newTableFromData(employees, employeeDataTypes);
-            tablePlaceholder.append(employeesTable);
+
+            function refreshTable() {
+                let employees = getData(endpoint);
+                let employeesTable = newTableFromData(employees, employeeDataTypes);
+                tablePlaceholder.innerHTML = '';
+                tablePlaceholder.append(employeesTable);
+            }
+
+            refreshTable();
         </script>
     </div>
 </body>

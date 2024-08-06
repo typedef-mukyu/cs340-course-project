@@ -327,7 +327,7 @@ function validateAttribute(data, dataType) {
     else if (dataType.type === "date") return !isNaN(Date.parse(data));
     else return true;
 }
-
+//Source: https://www.bezkoder.com/react-node-express-mysql/#Add_Navbar_to_React_CRUD_App
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const toggleButton = document.getElementById('toggleButton');

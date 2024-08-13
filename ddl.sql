@@ -1,3 +1,10 @@
+/*
+Citation Scope: General setup
+Date: 7/29/2024
+Originality: Adapted
+Source: https://github.com/osu-cs340-ecampus/react-starter-app/blob/main/App/backend/database/ddl.sql
+*/
+
 -- drop all tables about to be replaced
 DROP TABLE IF EXISTS EmployeePositions;
 DROP TABLE IF EXISTS ProjectEmployees;

@@ -1,3 +1,10 @@
+/*
+Citation Scope: Form submission, AJAX, Dropdown/table updating
+Date: 8/1/2024
+Originality: Adapted
+Source: https://github.com/osu-cs340-ecampus/nodejs-starter-app/tree/main/Step%208%20-%20Dynamically%20Updating%20Data/public/js
+*/
+
 function newDropdown(data, name, pk, nullable) {
     let dropdown = document.createElement("select");
     if (nullable) {
@@ -185,6 +192,18 @@ function refreshFilter(dropDown, table, endpoint, dataTypes) {
     newTableFromData(data, dataTypes, table);
 }
 
+//Display feedback after CRUD operation completes, displaying for 3 seconds
+function showFeedback(message, type) {
+    var feedbackElement = document.getElementById('feedback-message');
+    feedbackElement.innerText = message;
+    feedbackElement.style.display = 'block';
+
+    setTimeout(function() {
+        feedbackElement.style.display = 'none';
+    }, 3000);
+}
+
+
 function enterEditMode(event) {
     let row = event.target.closest("tr");
     let itemsToHide = row.querySelectorAll(".edit-mode-hidden");
@@ -194,6 +213,14 @@ function enterEditMode(event) {
     let itemsToShow = row.querySelectorAll(".edit-mode-visible");
     itemsToShow.forEach(item => {
         item.hidden = false;
+    });
+
+    // Prepopulate Date values when entering edit mode
+    itemsToShow.forEach(item => {
+        let input = item.querySelector("input[type='date']");
+        if (input && !input.value) {
+            input.value = item.closest("td").querySelector(".data-view-cell").innerText;
+        }
     });
 }
 
@@ -215,8 +242,10 @@ function commitChanges(event, endpoint, dataTypes) {
         console.log("Response from server:", xhr.status, xhr.responseText);
         if (xhr.status == 200) {
             refreshTable(endpoint, dataTypes);
+            showFeedback("Record updated successfully", "success");
         } else {
-            alert("Failed to update record.");
+            alert("Failed to update record");
+            showFeedback("Error updating record", "error");
         }
     };
     xhr.send(JSON.stringify(data));
@@ -256,8 +285,10 @@ function deleteRecord(event, endpoint, dataTypes) {
             console.log("Response from server:", xhr.status, xhr.responseText);
             if (xhr.status == 204) {
                 refreshTable(endpoint, dataTypes);
+                showFeedback("Record deleted successfully", "success");
             } else {
-                alert("Failed to delete record.");
+                alert("Failed to delete record");
+                showFeedback("Error deleting record", "error");
             }
         };
         xhr.send();
@@ -282,7 +313,6 @@ function addRow(button, endpoint, dataTypes) {
         return;
     }
 
-    console.log("Endpoint for adding row:", endpoint);
     let xhr = new XMLHttpRequest();
     xhr.open("POST", endpoint, true);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -290,8 +320,13 @@ function addRow(button, endpoint, dataTypes) {
         console.log("Response from server:", xhr.status, xhr.responseText);
         if (xhr.status == 201) {
             refreshTable(endpoint, dataTypes);
+            showFeedback("Record added successfully", "success");
+        } else if (xhr.status == 409) {
+            alert("Error: Duplicate entry detected.");
+            showFeedback("Error: Duplicate entry detected.", "error");
         } else {
-            alert("Failed to add record.");
+            alert("Failed to add record");
+            showFeedback("Error adding record", "error");
         }
     };
     xhr.send(JSON.stringify(data));

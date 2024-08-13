@@ -37,8 +37,8 @@
 
             var employeePositionDataTypes = [
                 {header: "Employee Position ID", attribName: "employeePositionID", type: "num0", nullable: false, autoinc: true},
-                {header: "Employee ID", attribName: "employeeID", type: "num0", nullable: false, fkinfo: {attribName: "fullName", fkName: "employeeID", pkName: "employeeID", data: getData("/employees")}},
-                {header: "Position ID", attribName: "positionID", type: "num0", nullable: false, fkinfo: {attribName: "positionTitle", fkName: "positionID", pkName: "positionID", data: getData("/positions")}},
+                {header: "Employee Name", attribName: "fullName", type: "num0", nullable: false, fkinfo: {attribName: "fullName", fkName: "employeeID", pkName: "employeeID", data: getData("/employees")}},
+                {header: "Position Title", attribName: "positionTitle", type: "num0", nullable: false, fkinfo: {attribName: "positionTitle", fkName: "positionID", pkName: "positionID", data: getData("/positions")}},
                 {header: "Salary", attribName: "salary", type: "num2", nullable: true},
                 {header: "Start Date", attribName: "startDate", type: "date", nullable: true},
                 {header: "End Date", attribName: "endDate", type: "date", nullable: true}

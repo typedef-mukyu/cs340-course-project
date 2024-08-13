@@ -37,8 +37,8 @@
 
             var projectEmployeeDataTypes = [
                 {header: "Project Employee ID", attribName: "projectEmployeeID", type: "num0", nullable: false, autoinc: true},
-                {header: "Employee ID", attribName: "employeeID", type: "num0", nullable: false, fkinfo: {attribName: "fullName", fkName: "employeeID", pkName: "employeeID", data: getData("/employees")}},
-                {header: "Project ID", attribName: "projectID", type: "num0", nullable: false, fkinfo: {attribName: "projectName", fkName: "projectID", pkName: "projectID", data: getData("/projects")}},
+                {header: "Employee Name", attribName: "fullName", type: "num0", nullable: false, fkinfo: {attribName: "fullName", fkName: "employeeID", pkName: "employeeID", data: getData("/employees")}},
+                {header: "Project Name", attribName: "projectName", type: "num0", nullable: false, fkinfo: {attribName: "projectName", fkName: "projectID", pkName: "projectID", data: getData("/projects")}},
                 {header: "Role", attribName: "role", type: "text", nullable: true},
                 {header: "Hours Worked Total", attribName: "hoursWorkedTotal", type: "num2", nullable: true}
             ];

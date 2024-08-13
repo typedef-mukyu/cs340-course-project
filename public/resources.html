@@ -30,6 +30,7 @@
 
         <div id="table-placeholder"></div>
 
+        <p>Filter by project: <span id="project-filter-select"></span></p>
         <script src="common.js"></script>
         <script>
             var tablePlaceholder = document.getElementById("table-placeholder");
@@ -40,7 +41,7 @@
                 {header: "Resource Name", attribName: "resourceName", type: "text", nullable: false},
                 {header: "Resource Cost", attribName: "resourceCost", type: "num2", nullable: true},
                 {header: "Resource Description", attribName: "resourceDesc", type: "text", nullable: true},
-                {header: "Project ID", attribName: "projectID", type: "num0", nullable: true, fkinfo: {attribName: "projectName", fkName: "projectID", pkName: "projectID", data: getData("/projects")}}
+                {header: "Project Name", attribName: "projectName", type: "num0", nullable: true, fkinfo: {attribName: "projectName", fkName: "projectID", pkName: "projectID", data: getData("/projects")}}
             ];
 
             function refreshTable() {
@@ -48,9 +49,13 @@
                 let resourcesTable = newTableFromData(resources, resourceDataTypes);
                 tablePlaceholder.innerHTML = '';
                 tablePlaceholder.append(resourcesTable);
+                var projectNameType = resourceDataTypes.find(attrib => {return attrib.attribName === "projectName"});
+                console.log(projectNameType);
+                let projectFilter = addFKFilterToTable(resourcesTable, projectNameType, resourceDataTypes, "/resources/projects/");
+                document.getElementById("project-filter-select").append(projectFilter);
             }
-
             refreshTable();
+            
         </script>
     </div>
 </body>

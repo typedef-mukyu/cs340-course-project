@@ -3,7 +3,7 @@ var app = express();
 var db = require('./db-connector');
 var path = require('path');
 var os = require("os") 
-PORT = 39393;
+PORT = 3939;
 
 /*
 Citation Scope: General setup, CRUD route structuring, DB query struture

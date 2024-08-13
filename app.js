@@ -2,8 +2,15 @@ var express = require('express');
 var app = express();
 var db = require('./db-connector');
 var path = require('path');
-var os = require("os") // for hostname()
+var os = require("os") 
 PORT = 39393;
+
+/*
+Citation Scope: General setup, CRUD route structuring, DB query struture
+Date: 8/1/2024
+Originality: Adapted
+Source: https://github.com/osu-cs340-ecampus/nodejs-starter-app/tree/main/Step%208%20-%20Dynamically%20Updating%20Data/public/js
+*/
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -15,7 +22,9 @@ app.get('/', function(req, res) {
 });
 
 /*
-    CRUD Routes - Employees
+
+    CRUD Routes for Emplyees
+
 */
 
 // Read all employees
@@ -57,7 +66,9 @@ app.delete('/employees/:id', function(req, res) {
 });
 
 /*
+
     CRUD Routes for Positions
+
 */
 
 // Read all positions
@@ -99,7 +110,9 @@ app.delete('/positions/:id', function(req, res) {
 });
 
 /*
-    CRUD Routes - Projects
+
+    CRUD Routes for Projects
+
 */
 
 // Read all projects
@@ -141,7 +154,9 @@ app.delete('/projects/:id', function(req, res) {
 });
 
 /*
-    CRUD Routes - Resources
+
+    CRUD Routes for Resources
+
 */
 
 // Read all resources
@@ -199,7 +214,9 @@ app.delete('/resources/:id', function(req, res) {
 });
 
 /*
-    CRUD Routes - EmployeePositions
+
+    CRUD Routes for EmployeePositions
+
 */
 
 // Read all employee positions
@@ -251,12 +268,20 @@ app.get('/project_employees', function(req, res) {
 });
 
 // Create a new project employee
-app.post('/project_employees', function(req, res) {
-    let query = 'INSERT INTO ProjectEmployees (employeeID, projectID, role, hoursWorkedTotal) VALUES (?, ?, ?, ?)';
-    let values = [req.body.employeeID, req.body.projectID, req.body.role, req.body.hoursWorkedTotal];
-    db.pool.query(query, values, function(err, results) {
-        if (err) throw err;
-        res.sendStatus(201);
+app.post('/project_employees', (req, res) => {
+    const query = 'INSERT INTO ProjectEmployees (employeeID, projectID, role, hoursWorkedTotal) VALUES (?, ?, ?, ?)';
+    const values = [req.body.employeeID, req.body.projectID, req.body.role, req.body.hoursWorkedTotal];
+
+    db.pool.query(query, values, (err, results) => {
+        if (err) {
+            if (err.code === 'ER_DUP_ENTRY') {
+                res.status(409).json({ message: 'Duplicate entry: This employee is already assigned to this project.' });
+            } else {
+                res.status(500).json({ message: 'Error adding project employee' });
+            }
+        } else {
+            res.sendStatus(201);
+        }
     });
 });
 
@@ -279,9 +304,7 @@ app.delete('/project_employees/:id', function(req, res) {
     });
 });
 
-/*
-    LISTENER
-*/
+// Start Express server and log incoming requests
 app.listen(PORT, function() {
     console.log('Express started on ' + os.hostname() + ":" + PORT + '; press Ctrl-C to terminate.');
 });

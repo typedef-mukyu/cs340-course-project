@@ -33,10 +33,11 @@
         <p>Filter by project: <span id="project-filter-select"></span></p>
         <script src="common.js"></script>
         <script>
+            // This JS code is original, though some functions in the linked common.js are adapted from the CS 340 starter code.
             var tablePlaceholder = document.getElementById("table-placeholder");
             var endpoint = "/resources";
 
-            var resourceDataTypes = [
+            var resourceDataTypes = [ // see newTableFromData() for a detailed explanation of this array format.
                 {header: "Resource ID", attribName: "resourceID", type: "num0", nullable: false, autoinc: true},
                 {header: "Resource Name", attribName: "resourceName", type: "text", nullable: false},
                 {header: "Resource Cost", attribName: "resourceCost", type: "num2", nullable: true},
@@ -44,14 +45,14 @@
                 {header: "Project Name", attribName: "projectName", type: "num0", nullable: true, fkinfo: {attribName: "projectName", fkName: "projectID", pkName: "projectID", data: getData("/projects")}}
             ];
 
-            function refreshTable() {
+            function refreshTable() { // get data from the table and display it, and the drop down filter.
                 let resources = getData(endpoint);
                 let resourcesTable = newTableFromData(resources, resourceDataTypes);
                 tablePlaceholder.innerHTML = '';
                 tablePlaceholder.append(resourcesTable);
                 var projectNameType = resourceDataTypes.find(attrib => {return attrib.attribName === "projectName"});
                 console.log(projectNameType);
-                let projectFilter = addFKFilterToTable(resourcesTable, projectNameType, resourceDataTypes, "/resources/projects/");
+                let projectFilter = addFKFilterToTable(resourcesTable, projectNameType, resourceDataTypes, "/resources/projects/"); // also add the drop-down filter in addition to the table.
                 document.getElementById("project-filter-select").append(projectFilter);
             }
             refreshTable();

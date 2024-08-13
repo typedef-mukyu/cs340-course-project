@@ -32,17 +32,18 @@
 
         <script src="common.js"></script>
         <script>
+            // This JS code is original, though some functions in the linked common.js are adapted from the CS 340 starter code.
             var tablePlaceholder = document.getElementById("table-placeholder");
             var endpoint = "/employees";
 
-            var employeeDataTypes = [
+            var employeeDataTypes = [ // see newTableFromData() for a detailed explanation of this array format.
                 {header: "Employee ID", attribName: "employeeID", type: "num0", nullable: false},
                 {header: "Full Name", attribName: "fullName", type: "text", nullable: false},
                 {header: "Username", attribName: "username", type: "text", nullable: false},
                 {header: "Project Hours Total", attribName: "projectHoursTotal", type: "num2", nullable: true}
             ];
 
-            function refreshTable() {
+            function refreshTable() { // get data from the table and display it
                 let employees = getData(endpoint);
                 let employeesTable = newTableFromData(employees, employeeDataTypes);
                 tablePlaceholder.innerHTML = '';

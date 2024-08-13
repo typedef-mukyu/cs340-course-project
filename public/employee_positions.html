@@ -32,10 +32,11 @@
 
         <script src="common.js"></script>
         <script>
+            // This JS code is original, though some functions in the linked common.js are adapted from the CS 340 starter code.
             var tablePlaceholder = document.getElementById("table-placeholder");
             var endpoint = "/employee_positions";
 
-            var employeePositionDataTypes = [
+            var employeePositionDataTypes = [ // see newTableFromData() for a detailed explanation of this array format.
                 {header: "Employee Position ID", attribName: "employeePositionID", type: "num0", nullable: false, autoinc: true},
                 {header: "Employee Name", attribName: "fullName", type: "num0", nullable: false, fkinfo: {attribName: "fullName", fkName: "employeeID", pkName: "employeeID", data: getData("/employees")}},
                 {header: "Position Title", attribName: "positionTitle", type: "num0", nullable: false, fkinfo: {attribName: "positionTitle", fkName: "positionID", pkName: "positionID", data: getData("/positions")}},
@@ -44,7 +45,7 @@
                 {header: "End Date", attribName: "endDate", type: "date", nullable: true}
             ];
 
-            function refreshTable() {
+            function refreshTable() { // get data from the table and display it
                 let employeePositions = getData(endpoint);
                 let employeePositionsTable = newTableFromData(employeePositions, employeePositionDataTypes);
                 tablePlaceholder.innerHTML = '';

@@ -1,10 +1,18 @@
 /*
-Citation Scope: Form submission, AJAX, Dropdown/table updating
+Citation Scope: Form submission, AJAX, Server-side table updating
 Date: 8/1/2024
-Originality: Adapted
+Originality: Adapted (alongside several fully original functions)
 Source: https://github.com/osu-cs340-ecampus/nodejs-starter-app/tree/main/Step%208%20-%20Dynamically%20Updating%20Data/public/js
+Code from addRow, commitChanges, and deleteRecord was adapted from the starter code, see comments in those functions.
 */
-
+/*
+Scope: Navbar implementation
+Date: 8/5/2024
+Originality: Adapted
+Source: https://www.bezkoder.com/react-node-express-mysql/#Add_Navbar_to_React_CRUD_App and https://stackoverflow.com/questions/20060467/add-active-navigation-class-based-on-url
+Code from the final event listener function were adapted from the above source.
+*/
+// All other functions in this file are original.
 /*  
  *  This function returns a new drop-down selector that selects between records in data.
  *  data: array[object] - A list of records retreived with getData() (or elsewhere).
@@ -40,6 +48,7 @@ function newDropdown(data, name, pk, nullable) {
  *  to the server's JSON response.
  *  endpoint: string - The path to the endpoint to send the request to.
  *  Returns: an Array[Object] of the data requested from the endpoint.
+ *  This function is fully original.
  */
 function getData(endpoint) {
     let xhr = new XMLHttpRequest(); // set up a new XHR
@@ -97,81 +106,83 @@ function newTableFromData(data, dataTypes, tableToReplace) {
     let body = document.createElement("tbody");
     if (data.length === 0) body.insertRow(); // placeholder row for CSS
     data.forEach(record => { // for each record in data
-        let row = body.insertRow();
-        row.dataset.primaryKey = record[dataTypes[0].attribName];
-        dataTypes.forEach(attrib => {
-            let cell = row.insertCell();
-            cell.dataset.attribName = attrib.attribName;
-            let dataCell = document.createElement("div");
+        let row = body.insertRow(); // insert a new row
+        row.dataset.primaryKey = record[dataTypes[0].attribName]; // set the first column as the primary key in the HTML data
+        dataTypes.forEach(attrib => { // for each attribute:
+            let cell = row.insertCell(); // insert a cell
+            cell.dataset.attribName = attrib.attribName; // set its attribute name in the HTML data
+            let dataCell = document.createElement("div"); // create a new div for view mode entries
             dataCell.classList.add("data-view-cell");
-            dataCell.classList.add("edit-mode-hidden");
-            if (record[attrib.attribName] && attrib.type === "date") dataCell.innerText = record[attrib.attribName].slice(0, 10);
-            else dataCell.innerText = record[attrib.attribName];
-            let editCell = document.createElement("div");
+            dataCell.classList.add("edit-mode-hidden"); // make this only visible in view mode
+            if (record[attrib.attribName] && attrib.type === "date") dataCell.innerText = record[attrib.attribName].slice(0, 10); // remove the time section of date-only attributes (since the DB backend formats it that way)
+            else dataCell.innerText = record[attrib.attribName]; // otherwise fill the cell with the attribute data
+            let editCell = document.createElement("div"); // create a new div for edit mode entries
             editCell.classList.add("data-edit-cell");
-            editCell.classList.add("edit-mode-visible");
-            editCell.hidden = true;
+            editCell.classList.add("edit-mode-visible"); // make this only visible in edit mode
+            editCell.hidden = true; // and hide it now
 
-            if (attrib.fkinfo) {
-                let dropDown = newDropdown(attrib.fkinfo.data, attrib.fkinfo.attribName, attrib.fkinfo.pkName, attrib.nullable);
-                dropDown.value = record[attrib.fkinfo.fkName];
+            if (attrib.fkinfo) { // if this attribute is a foreign key:
+                let dropDown = newDropdown(attrib.fkinfo.data, attrib.fkinfo.attribName, attrib.fkinfo.pkName, attrib.nullable); // create a dropdown to select referenced records in edit mode
+                dropDown.value = record[attrib.fkinfo.fkName]; // set the internal value to that of the FK
                 dropDown.id = ("edit-cell-" + record[dataTypes[0].attribName] + "-" + attrib.attribName);
-                editCell.append(dropDown);
-            } else {
+                editCell.append(dropDown); // and append it to the edit mode cell
+            } else { // otherwise create a standard input field
                 let valueInput = document.createElement("input");
-                if (attrib.autoinc) valueInput.disabled = true;
-                else if (!attrib.nullable) valueInput.required = true;
-                if (attrib.type === "str") {
-                    valueInput.type = "text";
-                } else if (attrib.type.slice(0, 2) === "num") {
-                    valueInput.type = "number";
+                if (attrib.autoinc) valueInput.disabled = true; // disable editing of auto-increment attributes
+                else if (!attrib.nullable) valueInput.required = true; // make non-nullable attributes required
+                // select the type of input for the input field; this should correspond to the SQL data type in most cases
+                if (attrib.type === "str") { // for varchars and text types
+                    valueInput.type = "text"; 
+                } else if (attrib.type.slice(0, 2) === "num") { // trailing digits indicate number of places after decimal
+                    valueInput.type = "number"; // e.g., num0 -> int, num2 -> decimal(x, 2), etc.
                     valueInput.step = String(10 ** (-attrib.type.slice(3)));
-                } else if (attrib.type === "date") {
+                } else if (attrib.type === "date") { // for date types
                     valueInput.type = "date";
                 }
-                valueInput.value = record[attrib.attribName];
+
+                valueInput.value = record[attrib.attribName]; // set the current value to that in the data
                 valueInput.id = ("edit-cell-" + record[dataTypes[0].attribName] + "-" + attrib.attribName);
-                editCell.append(valueInput);
+                editCell.append(valueInput); // and append it to the edit cell
             }
-            cell.append(dataCell, editCell);
+            cell.append(dataCell, editCell); // and append both of these to the main cell
         });
-        let editButtonCell = row.insertCell();
+        let editButtonCell = row.insertCell(); // insert a new cell for the edit button
         let editButton = document.createElement("button");
         editButton.classList.add("edit-button", "edit-mode-hidden");
         editButton.innerText = "Edit";
         editButton.addEventListener("click", enterEditMode);
-        let saveButton = document.createElement("button");
+        let saveButton = document.createElement("button"); // the save button takes its place in edit mode
         saveButton.classList.add("save-button", "edit-mode-visible");
         saveButton.innerText = "Save";
         saveButton.hidden = true;
         saveButton.addEventListener("click", (event) => commitChanges(event, endpoint, dataTypes));
 
-        editButtonCell.append(editButton, saveButton);
+        editButtonCell.append(editButton, saveButton); // append these buttons to the edit button cell
 
-        let delButtonCell = row.insertCell();
+        let delButtonCell = row.insertCell(); // insert a new cell for the delete button
         let delButton = document.createElement("button");
         delButton.classList.add("delete-button", "edit-mode-hidden");
         delButton.innerText = "Delete";
         delButton.addEventListener("click", (event) => deleteRecord(event, endpoint, dataTypes));
-        let cancelButton = document.createElement("button");
+        let cancelButton = document.createElement("button"); // the cancel button takes its place in edit mode
         cancelButton.classList.add("cancel-button", "edit-mode-visible");
         cancelButton.innerText = "Cancel";
         cancelButton.hidden = true;
-        cancelButton.addEventListener("click", discardChanges);
+        cancelButton.addEventListener("click", discardChanges); 
 
-        delButtonCell.append(delButton, cancelButton);
+        delButtonCell.append(delButton, cancelButton); // append these buttons to the delete button cell
     });
-
-    table.append(body);
-    let footer = newFooter(dataTypes);
-    table.append(footer);
-    return table;
+    table.append(body); // append this table body to the table
+    let footer = newFooter(dataTypes); // and create a footer for the table
+    table.append(footer); // append the footer to the table
+    return table; // and return the completed table
 }
 
 /*
  *  This function creates a new header for the table created with newTableFromData().
  *  dataTypes: array[object] - A list of objects, each of which corespond to a header.
  *  Returns: A <thead> element containing the headers to each column of the table.
+ *  This function is fully original.
  */
 function newHeaderFromDataTypes(dataTypes){
     let header = document.createElement("thead"); // create the outer header element
@@ -189,6 +200,7 @@ function newHeaderFromDataTypes(dataTypes){
  *  This function creates a new footer for the table created with newTableFromData().
  *  dataTypes: array[object] - A list of objects, each of which corespond to an input field on the footer.
  *  Returns: A <tfoot> element containing the headers to each column of the table.
+ *  This function is fully original.
  */
 function newFooter(dataTypes){
     let footer = document.createElement("tfoot"); // create the outer footer element
@@ -238,6 +250,7 @@ function newFooter(dataTypes){
  *  dataTypes: The dataTypes array of the referencing table (see newTableFromData()).
  *  endpoint: The endpoint to get filtered results from, should be a subdir of the main endpoint and slash-terminated.
  *  Returns a <select> drop-down that refreshes the filter when changed.
+ *  This function is fully original.
  */
 function addFKFilterToTable(table, attrib, dataTypes, endpoint) {
     let dropDown = newDropdown(attrib.fkinfo.data, attrib.fkinfo.attribName, attrib.fkinfo.pkName, attrib.nullable); // create a new drop-down with the corresponding attribute name and FK
@@ -257,6 +270,7 @@ function addFKFilterToTable(table, attrib, dataTypes, endpoint) {
  *  table: The table to refresh.
  *  endpoint: The endpoint to get filtered results from, should be a subdir of the main endpoint and slash-terminated.
  *  dataTypes: The dataTypes array of the referencing table (see newTableFromData()).
+ *  This function is fully original.
  */
 function refreshFilter(dropDown, table, endpoint, dataTypes) {
     let url;
@@ -267,6 +281,7 @@ function refreshFilter(dropDown, table, endpoint, dataTypes) {
 }
 
 //Display feedback after CRUD operation completes, displaying for 3 seconds
+// This function is original.
 function showFeedback(message, type) {
     var feedbackElement = document.getElementById('feedback-message');
     feedbackElement.innerText = message;
@@ -278,6 +293,7 @@ function showFeedback(message, type) {
 }
 
 // This is an event listener for the Edit button, which changes the fields to input fields and shows the Save and Cancel buttons.
+// This function is fully original.
 function enterEditMode(event) {
     let row = event.target.closest("tr"); // get the row this button was pressed in
     let itemsToHide = row.querySelectorAll(".edit-mode-hidden"); // hide all view mode buttons
@@ -296,13 +312,14 @@ function enterEditMode(event) {
         }
     });
 }
+// This is an adaptation from the CS 340 starter code referenced above.
 // This is an event listener for the Save button, which sends the PUT request for an UPDATE.
 function commitChanges(event, endpoint, dataTypes) {
-    let row = event.target.closest("tr");
+    let row = event.target.closest("tr"); // Modified to locate the edit fields based on the save button clicked
     let primaryKey = row.dataset.primaryKey;
-    let data = createObjFromRow(row, dataTypes);
+    let data = createObjFromRow(row, dataTypes); // and to get data from that set of input fields in the table
     console.log("Committing changes for primaryKey:", primaryKey, "with data:", data);
-    if (!validateData(data, dataTypes)) {
+    if (!validateData(data, dataTypes)) { // and to validate data client-side
         alert("One or more entry fields are invalid.");
         return;
     }
@@ -323,15 +340,13 @@ function commitChanges(event, endpoint, dataTypes) {
     };
     xhr.send(JSON.stringify(data));
 }
-/*  
- *  
- *  
- *  
- */
+// This is an event listener for the Cancel button, which leaves edit mode
+// without committing to the database.
+// This function is fully original.
 function discardChanges(event) {
-    let row = event.target.closest("tr");
-    let cells = row.querySelectorAll("td");
-    cells.forEach(cell => {
+    let row = event.target.closest("tr"); // get the row this button was clicked in
+    let cells = row.querySelectorAll("td"); // and all the cells in this row
+    cells.forEach(cell => { // reset the values of these cells to the current ones for the next edit mode usage
         let oldData = cell.querySelector(".data-view-cell");
         let newData = cell.querySelector(".data-edit-cell");
 
@@ -339,23 +354,20 @@ function discardChanges(event) {
             newData.innerText = oldData.innerText;
         }
     });
-    let itemsToHide = row.querySelectorAll(".edit-mode-visible");
+    let itemsToHide = row.querySelectorAll(".edit-mode-visible"); // hide all edit-mode cells
     itemsToHide.forEach(item => {
         item.hidden = true;
     });
-    let itemsToShow = row.querySelectorAll(".edit-mode-hidden");
+    let itemsToShow = row.querySelectorAll(".edit-mode-hidden"); // show all view-mode cells
     itemsToShow.forEach(item => {
         item.hidden = false;
     });
 }
-/*  
- *  
- *  
- *  
- */
+// This is an adaptation from the CS 340 starter code.
+// This is an event listener for the Delete button, which deletes the corresponding record from the database
 function deleteRecord(event, endpoint, dataTypes) {
-    if (confirm("Really delete this record?")) {
-        let row = event.target.closest("tr");
+    if (confirm("Really delete this record?")) { // Modified to provide confirmation 
+        let row = event.target.closest("tr"); // and to locate the record from the location of the delete button pressed
         let primaryKey = row.dataset.primaryKey;
         console.log("Deleting record with primaryKey:", primaryKey);
 
@@ -376,20 +388,15 @@ function deleteRecord(event, endpoint, dataTypes) {
     }
 }
 
-function generateRandomEmployeeID() {
-    return Math.floor(10000000 + Math.random() * 90000000).toString();
-}
 
+// This is an adaptation from the starter code referenced at the start of this file.
+// This is an event listener for the Add button, which inserts a row into the database.
 function addRow(button, endpoint, dataTypes) {
-    let row = button.closest("tr");
+    let row = button.closest("tr"); // Modified starter code to get inputs from the footer input fields of the table
     let data = createObjFromRow(row, dataTypes);
-    // let employeeIDAttribute = dataTypes.find(attribute => attribute.attribName === "employeeID");
-    // if (employeeIDAttribute && !data[employeeIDAttribute.attribName]) {
-    //     data[employeeIDAttribute.attribName] = generateRandomEmployeeID();
-    // }
 
     console.log("Adding row data:", data);
-    if (!validateData(data, dataTypes)) {
+    if (!validateData(data, dataTypes)) { // Also modified starter code for client-side data validation
         alert("One or more entry fields are invalid.");
         return;
     }
@@ -402,7 +409,7 @@ function addRow(button, endpoint, dataTypes) {
         if (xhr.status == 201) {
             refreshTable(endpoint, dataTypes);
             showFeedback("Record added successfully", "success");
-        } else if (xhr.status == 409) {
+        } else if (xhr.status == 409) { // Modified to detect duplicate entries (as we have unique restrictions in the DB)
             alert("Error: Duplicate entry detected.");
             showFeedback("Error: Duplicate entry detected.", "error");
         } else {
@@ -413,6 +420,12 @@ function addRow(button, endpoint, dataTypes) {
     xhr.send(JSON.stringify(data));
 }
 
+/*  
+ *  Creates an object (like that in the data entries) from a row of table input fields.
+ *  row: A <tr> element containing input fields to create an object from.
+ *  dataTypes: The dataTypes array of the corresponding table (see newTableFromData()).
+ *  This function is fully original.
+ */
 function createObjFromRow(row, dataTypes) {
     let cells = row.querySelectorAll("td");
     let output = {};
@@ -424,27 +437,40 @@ function createObjFromRow(row, dataTypes) {
     });
     return output;
 }
-
+/*
+ *  Validates data in an entity against the dataTypes for that table. 
+ *  This function is fully original.
+ *  entity: A record of data to verify.
+ *  dataTypes: The dataTypes array to verify against (see newTableFromData()).
+ *  Returns true if all attributes are valid (no null data on NOT NULL attributes, numeric fields are numeric, etc).
+ *  This function is fully original.
+ */
 function validateData(entity, dataTypes) {
     let attributes = Object.entries(entity);
-    let result = attributes.every(record => {
+    let result = attributes.every(record => { // for each attribute
         let dataType = dataTypes.find(currentType => {
-            return (currentType.attribName === record[0]);
+            return (currentType.attribName === record[0]); // find the corresponding dataTypes entry
         });
-        return validateAttribute(record[1], dataType);
+        return validateAttribute(record[1], dataType); // and validate it
     });
     return result;
 }
-
+/*
+ *  Validates a single attribute of data:
+ *  data: any - The data to validate.
+ *  dataType: A dataTypes entry corresponding to the attribute being verified.
+ *  This function is fully original.
+ */
 function validateAttribute(data, dataType) {
-    if (data === "" || data === null) {
+    if (data === "" || data === null) { // null or empty strings should only be validated on nullable or auto-increment attributes
         if (dataType.nullable || dataType.autoinc) return true;
         else return false;
-    } else if (dataType.type.slice(0, 3) === "num") return (!isNaN(Number(data)));
-    else if (dataType.type === "date") return !isNaN(Date.parse(data));
-    else return true;
+    } else if (dataType.type.slice(0, 3) === "num") return (!isNaN(Number(data))); // numeric types should parse to a number
+    else if (dataType.type === "date") return !isNaN(Date.parse(data)); // date types should parse to a date
+    else return true; // non-empty string types and other not-yet-implemented variables will pass validation
 }
-//Source: https://www.bezkoder.com/react-node-express-mysql/#Add_Navbar_to_React_CRUD_App
+// This is for the sidebar function in the web interface.
+// Adapted from: https://www.bezkoder.com/react-node-express-mysql/#Add_Navbar_to_React_CRUD_App (corresponding to HTML files)
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const toggleButton = document.getElementById('toggleButton');

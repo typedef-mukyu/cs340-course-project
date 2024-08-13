@@ -1,39 +1,76 @@
+/*  
+ *  This function returns a new drop-down selector that selects between records in data.
+ *  data: array[object] - A list of records retreived with getData() (or elsewhere).
+ *  name: string - The name of the attribute corresponding to a friendly name in the data;
+ *      values of this attribute are shown to the user.
+ *  pk: string - The name of the attribute corresponding to the primary key in the data; 
+ *      values of this attribute decide the selector's value attribute.
+ *  nullable: boolean - If true, adds an additional "None" value corresponding to an empty
+ *      string HTML value (null foreign key).
+ *  Returns: an HTML <select> element with one option corresponding to each entry in data,
+ *      and optionally a (None) value.
+ */
 function newDropdown(data, name, pk, nullable) {
-    let dropdown = document.createElement("select");
-    if (nullable) {
+    let dropdown = document.createElement("select"); // create a new drop down
+    if (nullable) { // add the nullable selector with an empty value if needed
         let nullSelector = document.createElement("option");
         nullSelector.value = "";
         nullSelector.text = "(None)";
         dropdown.append(nullSelector);
     }
-    data.forEach(record => {
-        let option = document.createElement("option");
-        option.value = record[pk];
-        option.text = record[name];
-        dropdown.append(option);
+    data.forEach(record => { // for each record in the data:
+        let option = document.createElement("option"); // create an option for the selector for that record
+        option.value = record[pk]; // have its internal value be the primary key of that record
+        option.text = record[name]; // have its user facing (text) value be the friendly name of that record
+        dropdown.append(option); // and add that option to the selector
     });
-    return dropdown;
+    return dropdown; // return the drop-down selector once finished
 }
-
+/*  
+ *  This function gets data from the server (see app.js) on the corresponding endpoint, 
+ *  and returns the data received from the endpoint as an array of objects corresponding
+ *  to the server's JSON response.
+ *  endpoint: string - The path to the endpoint to send the request to.
+ *  Returns: an Array[Object] of the data requested from the endpoint.
+ */
 function getData(endpoint) {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", endpoint, false);
-    xhr.send();
-    return JSON.parse(xhr.response);
+    let xhr = new XMLHttpRequest(); // set up a new XHR
+    xhr.open("GET", endpoint, false); // prepare a GET request to the corresponding endpoint in synchronous mode
+    xhr.send(); // and send that request
+    return JSON.parse(xhr.response); // and return the data received from the server
 }
-
+/*  
+ *  This function refreshes the table in the CRUD page, pulling new data from the
+ *  endpoint specified.
+ *  endpoint: string - The path to the endpoint to send the request to.
+ *  dataTypes: array[object]: A list of entries describing each column to display (from left to right). See below.
+ *  Returns: nothing.
+ */
 function refreshTable(endpoint, dataTypes) {
-    let data = getData(endpoint);
+    let data = getData(endpoint); // get a new data table from the server
     console.log("Data retrieved for table:", data); // Log the data retrieved
-    newTableFromData(data, dataTypes, document.querySelector("table"));
+    newTableFromData(data, dataTypes, document.querySelector("table")); // replace the existing table
 }
 
-/*  dataTypes[] is an array of:
- *  {
- *      attribName: name of attribute
- *      type: ("")
- *      fkInfo: {attribName, fkName, pkName, data}
- *      nullable: boolean
+/*  
+ *  This function creates a new table from the specified data, displaying columns described by dataTypes.
+ *  data: array[object] - The data to show in the table, retrieved with getData().
+ *  dataTypes: array[object] - A list of objects, each describing a column to display.
+ *  tableToReplace: HTML element - The table to replace, or undefined to create a new table.
+ *  dataTypes[] is an array of:
+ *  {   
+ *      header: string - A friendly name to describe the attribute (used in the headers of the table)
+ *      attribName: string - The name of the attribute as it appears in a record
+ *      type: string - The type of the data (for input fields): "text", ("num0", "num1", and so on [decimal places to display]), or "date"
+ *      fkInfo: object - A set of data to describe a foreign key as shown below: {
+ *          attribName: string - The target attribute name on the referenced table
+ *          fkName: string - The foreign key attribute name on the referencing table
+ *          pkName: string - The primary key attribute name on the referenced table
+ *          data: array[object] - The data of the referenced table.
+ *      }
+ *      nullable: boolean - Whether or not the attribute can have a NULL value.
+ *      autoinc: boolean - Whether or not the attribute is incremented automatically.
+ *          Setting this disables the corresponding field.
  *  }
  */
 function newTableFromData(data, dataTypes, tableToReplace) {
@@ -163,7 +200,11 @@ function newTableFromData(data, dataTypes, tableToReplace) {
     table.append(footer);
     return table;
 }
-
+/*  
+ *  
+ *  
+ *  
+ */
 function addFKFilterToTable(table, data, pk, name, nullable, dataTypes, endpoint) {
     let dropDown = newDropdown(data, pk, name, nullable);
     let anySelector = document.createElement("option");
@@ -176,7 +217,11 @@ function addFKFilterToTable(table, data, pk, name, nullable, dataTypes, endpoint
     });
     return dropDown;
 }
-
+/*  
+ *  
+ *  
+ *  
+ */
 function refreshFilter(dropDown, table, endpoint, dataTypes) {
     let url;
     if (dropDown.value == "-1") url = endpoint + "..";
@@ -184,7 +229,11 @@ function refreshFilter(dropDown, table, endpoint, dataTypes) {
     let data = getData(url);
     newTableFromData(data, dataTypes, table);
 }
-
+/*  
+ *  
+ *  
+ *  
+ */
 function enterEditMode(event) {
     let row = event.target.closest("tr");
     let itemsToHide = row.querySelectorAll(".edit-mode-hidden");
@@ -196,7 +245,11 @@ function enterEditMode(event) {
         item.hidden = false;
     });
 }
-
+/*  
+ *  
+ *  
+ *  
+ */
 function commitChanges(event, endpoint, dataTypes) {
     let row = event.target.closest("tr");
     let primaryKey = row.dataset.primaryKey;
@@ -221,7 +274,11 @@ function commitChanges(event, endpoint, dataTypes) {
     };
     xhr.send(JSON.stringify(data));
 }
-
+/*  
+ *  
+ *  
+ *  
+ */
 function discardChanges(event) {
     let row = event.target.closest("tr");
     let cells = row.querySelectorAll("td");
@@ -242,7 +299,11 @@ function discardChanges(event) {
         item.hidden = false;
     });
 }
-
+/*  
+ *  
+ *  
+ *  
+ */
 function deleteRecord(event, endpoint, dataTypes) {
     if (confirm("Really delete this record?")) {
         let row = event.target.closest("tr");
